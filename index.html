@@ -19730,7 +19730,6 @@ html,.default-font-family {
     white-space: nowrap;
     transform: scale(.95);
     transform-origin: 0 0;
-    direction: rtl;
     }
     .date-din-pro {
             --toast-icon-margin-start: -3px;
@@ -26165,6 +26164,47 @@ html,.default-font-family {
                     saveBtn.disabled = false;
                 });
             });
+            document.addEventListener('DOMContentLoaded', () => {
+    const nickname = document.querySelector('.nickname');
+    if (!nickname) return;
+
+    let scrollInterval = null;
+
+    // Функция, которая принудительно прокручивает текст к концу (вправо)
+    function forceScrollToEnd() {
+        // Прокручиваем визуальную часть
+        nickname.scrollLeft = nickname.scrollWidth;
+        
+        // Прокручиваем позицию курсора (Selection)
+        const range = document.createRange();
+        const sel = window.getSelection();
+        // Если внутри текста есть другие теги (например <br>), ставим курсор в самый конец
+        if (nickname.childNodes.length > 0) {
+            range.setStartAfter(nickname.childNodes[nickname.childNodes.length - 1]);
+        } else {
+            range.selectNodeContents(nickname);
+        }
+        range.collapse(true); // Сворачиваем диапазон в одну точку (курсор)
+        sel.removeAllRanges();
+        sel.addRange(range);
+    }
+
+    // Когда человек кликает на поле для ввода
+    nickname.addEventListener('focus', () => {
+        // Сразу прокручиваем к концу
+        forceScrollToEnd();
+        // Запускаем проверку каждые 10 миллисекунд на случай, 
+        // если человек печатает очень быстро или вставляет текст
+        scrollInterval = setInterval(forceScrollToEnd, 10);
+    });
+
+    // Когда человек убирает курсор из поля
+    nickname.addEventListener('blur', () => {
+        // Останавливаем проверку
+        clearInterval(scrollInterval);
+        scrollInterval = null;
+    });
+});
         </script>
     </body>
 </html>
