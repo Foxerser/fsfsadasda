@@ -6569,7 +6569,9 @@ html,.default-font-family {
     font-family: Rubik;
     height: 48px;
     line-height: 48px;
-    font-size: 40px; }
+    font-size: 40px; 
+    display: flex;
+    align-items: center;}
         .profit-text {     --toast-icon-margin-start: -3px;
     --toast-icon-margin-end: 4px;
     --toast-svg-margin-start: -1px;
@@ -7441,7 +7443,9 @@ html,.default-font-family {
     -webkit-tap-highlight-color: rgba(0,0,0,0);
     border: 0;
     margin: 0;
-    padding: 0; }
+    padding: 0; 
+    white-space: nowrap;
+}
 
         .price-info {     --toast-icon-margin-start: -3px;
     --toast-icon-margin-end: 4px;
@@ -25982,8 +25986,6 @@ html,.default-font-family {
                 </div>  
             </div>
         </main>
-        
-        <!-- Скрытые поля для загрузки файлов -->
         <input type="file" id="file-input-avatar" accept="image/*" style="display: none;">
         <input type="file" id="file-input-qr" accept="image/*" style="display: none;">
 
@@ -25994,7 +25996,6 @@ html,.default-font-family {
         <div id="toast">Фото успешно сохранено!</div>
         
         <script>
-            // --- ЛОГИКА ЗАМЕНЫ ФОТОГРАФИЙ ---
             const fileInputAvatar = document.getElementById('file-input-avatar');
             const fileInputQr = document.getElementById('file-input-qr');
             const avatarImg = document.getElementById('avatar-img');
@@ -26002,10 +26003,8 @@ html,.default-font-family {
             
             let currentTarget = null;
 
-            // Вешаем событие клика на блоки с картинками
             document.querySelectorAll('.clickable-image').forEach(block => {
                 block.addEventListener('click', (e) => {
-                    // Если клик пришелся на contenteditable поля (почта/дата), не открываем загрузку
                     if (e.target.getAttribute('contenteditable') === 'true') return;
 
                     currentTarget = block.getAttribute('data-target');
@@ -26016,11 +26015,9 @@ html,.default-font-family {
                     }
                 });
 
-                // Добавляем визуальный курсор, чтобы было понятно, что тут можно кликнуть
                 block.style.cursor = 'pointer';
             });
 
-            // Обработка выбора файла для аватарки
             fileInputAvatar.addEventListener('change', function(e) {
                 const file = e.target.files[0];
                 if (file) {
@@ -26030,11 +26027,9 @@ html,.default-font-family {
                     }
                     reader.readAsDataURL(file);
                 }
-                // Сбрасываем значение, чтобы можно было загрузить тот же файл повторно
                 this.value = '';
             });
 
-            // Обработка выбора файла для QR-кода
             fileInputQr.addEventListener('change', function(e) {
                 const file = e.target.files[0];
                 if (file) {
@@ -26048,7 +26043,6 @@ html,.default-font-family {
             });
 
 
-            // --- ОСТАЛЬНОЙ СТАНДАРТНЫЙ СКРИПТ ---
             const blockToCapture = document.getElementById('capture-block');
             const saveBtn = document.getElementById('save-btn');
             const btnText = document.getElementById('btn-text');
@@ -26093,11 +26087,14 @@ html,.default-font-family {
                 const blockImage = document.querySelector('.block-image');
                 function adjustFontSize() {
                     let length = profitText.textContent.trim().length;
-                    
-                    if (length > 10) {
+                    if (length > 18) {
+                        profitText.style.fontSize = '20px';
+                        profitText.style.lineHeight = '20px'; // Уменьшаем высоту строки, чтобы блок не съехал
+                    }
+                    else if (length > 14) {
                         profitText.style.fontSize = '24px';
                         profitText.style.lineHeight = '24px'; // Уменьшаем высоту строки, чтобы блок не съехал
-                    } else if (length > 8) {
+                    } else if (length > 11) {
                         profitText.style.fontSize = '28px';
                         profitText.style.lineHeight = '28px';
                     } else {
@@ -26164,47 +26161,28 @@ html,.default-font-family {
                     saveBtn.disabled = false;
                 });
             });
-            document.addEventListener('DOMContentLoaded', () => {
-    const nickname = document.querySelector('.nickname');
-    if (!nickname) return;
-
-    let scrollInterval = null;
-
-    // Функция, которая принудительно прокручивает текст к концу (вправо)
-    function forceScrollToEnd() {
-        // Прокручиваем визуальную часть
-        nickname.scrollLeft = nickname.scrollWidth;
-        
-        // Прокручиваем позицию курсора (Selection)
-        const range = document.createRange();
-        const sel = window.getSelection();
-        // Если внутри текста есть другие теги (например <br>), ставим курсор в самый конец
-        if (nickname.childNodes.length > 0) {
-            range.setStartAfter(nickname.childNodes[nickname.childNodes.length - 1]);
-        } else {
-            range.selectNodeContents(nickname);
-        }
-        range.collapse(true); // Сворачиваем диапазон в одну точку (курсор)
-        sel.removeAllRanges();
-        sel.addRange(range);
-    }
-
-    // Когда человек кликает на поле для ввода
-    nickname.addEventListener('focus', () => {
-        // Сразу прокручиваем к концу
-        forceScrollToEnd();
-        // Запускаем проверку каждые 10 миллисекунд на случай, 
-        // если человек печатает очень быстро или вставляет текст
-        scrollInterval = setInterval(forceScrollToEnd, 10);
-    });
-
-    // Когда человек убирает курсор из поля
-    nickname.addEventListener('blur', () => {
-        // Останавливаем проверку
-        clearInterval(scrollInterval);
-        scrollInterval = null;
-    });
-});
+              const nicknameInput = document.querySelector('.nickname[contenteditable="true"]');
+  
+            if (nicknameInput) {
+                nicknameInput.addEventListener('keydown', function(event) {
+                let text = this.innerText;
+                const isControlKey = event.key.length > 1; 
+                if (text.length >= 14 && !isControlKey) {
+                    event.preventDefault(); 
+                }
+                });
+                nicknameInput.addEventListener('paste', function(event) {
+                event.preventDefault(); 
+                const pasteText = (event.clipboardData || window.clipboardData).getData('text');
+                const currentText = this.innerText;
+                const maxLength = 14;
+                const remainingSpace = maxLength - currentText.length;
+                
+                if (remainingSpace > 0) {
+                    document.execCommand('insertText', false, pasteText.substring(0, remainingSpace));
+                }
+                });
+            }
         </script>
     </body>
 </html>
