@@ -19730,6 +19730,7 @@ html,.default-font-family {
     white-space: nowrap;
     transform: scale(.95);
     transform-origin: 0 0;
+    direction: rtl;
     }
     .date-din-pro {
             --toast-icon-margin-start: -3px;
@@ -26091,11 +26092,25 @@ html,.default-font-family {
             document.addEventListener('DOMContentLoaded', () => {
                 const profitText = document.querySelector('.profit-text');
                 const blockImage = document.querySelector('.block-image');
-                
+                function adjustFontSize() {
+                    let length = profitText.textContent.trim().length;
+                    
+                    if (length > 10) {
+                        profitText.style.fontSize = '24px';
+                        profitText.style.lineHeight = '24px'; // Уменьшаем высоту строки, чтобы блок не съехал
+                    } else if (length > 8) {
+                        profitText.style.fontSize = '28px';
+                        profitText.style.lineHeight = '28px';
+                    } else {
+                        profitText.style.fontSize = '36px'; 
+                        profitText.style.lineHeight = '36px';
+                    }
+                }
                 function updateProfitState() {
                     let text = profitText.textContent.trim();
                     let numStr = text.replace('%', '').trim();
                     let number = parseFloat(numStr);
+                    
                     if (isNaN(number)) return;
                     
                     if (number < 0) {
@@ -26106,7 +26121,11 @@ html,.default-font-family {
                         blockImage.style.backgroundImage = "url('img/profit_style1_V7.png')";
                     }
                 }
-                profitText.addEventListener('input', updateProfitState);
+                profitText.addEventListener('input', () => {
+                    adjustFontSize();
+                    updateProfitState();
+                });
+                adjustFontSize();
                 updateProfitState();
             });
 
