@@ -25945,20 +25945,20 @@ html,.default-font-family {
                 <span class="divider"></span>
                 <span class="base-item down" id="direction-text">Шорт</span>
                 <span class="divider"></span>
-                <span class="base-item" contenteditable="true">20X</span>
+                <span class="base-item" id="multiplier" contenteditable="true">20X</span>
             </div>
             <span class="order-profit-desc" id="type-text">Доходность</span>
             <div class="order-profit-proc">
-                <span class="profit-text" contenteditable="true">0%</span>
+                <span class="profit-text" id="profit-text">0.00%</span>
             </div>
             <ul class="price-info">
                 <li class="price-item">
                     <p class="label">Последняя цена</p>
-                    <p class="value" contenteditable="true">1,100.0</p>
+                    <p class="value" id="last-price" contenteditable="true">1,100.0</p>
                 </li>
                 <li class="price-item">
                     <p class="label-two">Цена входа</p>
-                    <p class="value-two" contenteditable="true">1,100.0</p>
+                    <p class="value-two" id="entry-price" contenteditable="true">1,100.0</p>
                 </li>
             </ul>
             <div data-v-2299138f="" class="user-invite-info">
@@ -26000,47 +26000,31 @@ html,.default-font-family {
             const fileInputQr = document.getElementById('file-input-qr');
             const avatarImg = document.getElementById('avatar-img');
             const qrImg = document.getElementById('qr-img');
-            
             let currentTarget = null;
 
             document.querySelectorAll('.clickable-image').forEach(block => {
                 block.addEventListener('click', (e) => {
                     if (e.target.getAttribute('contenteditable') === 'true') return;
-
                     currentTarget = block.getAttribute('data-target');
-                    if (currentTarget === 'avatar') {
-                        fileInputAvatar.click();
-                    } else if (currentTarget === 'qr') {
-                        fileInputQr.click();
-                    }
+                    if (currentTarget === 'avatar') fileInputAvatar.click();
+                    else if (currentTarget === 'qr') fileInputQr.click();
                 });
-
                 block.style.cursor = 'pointer';
             });
 
-            fileInputAvatar.addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(ev) {
-                        avatarImg.src = ev.target.result;
+            function handleImageUpload(input, imgElement) {
+                input.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(ev) { imgElement.src = ev.target.result; };
+                        reader.readAsDataURL(file);
                     }
-                    reader.readAsDataURL(file);
-                }
-                this.value = '';
-            });
-
-            fileInputQr.addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(ev) {
-                        qrImg.src = ev.target.result;
-                    }
-                    reader.readAsDataURL(file);
-                }
-                this.value = '';
-            });
+                    this.value = '';
+                });
+            }
+            handleImageUpload(fileInputAvatar, avatarImg);
+            handleImageUpload(fileInputQr, qrImg);
 
 
             const blockToCapture = document.getElementById('capture-block');
@@ -26049,80 +26033,106 @@ html,.default-font-family {
             const spinner = document.getElementById('spinner');
             const toast = document.getElementById('toast');
 
-            document.addEventListener('DOMContentLoaded', () => {
-                const directionText = document.getElementById('direction-text');
-                directionText.addEventListener('click', () => {
-                    if (directionText.textContent.trim() === 'Шорт') {
-                        directionText.textContent = 'Лонг';
-                        directionText.classList.remove('down');
-                        directionText.classList.add('up');
-                    } else {
-                        directionText.textContent = 'Шорт';
-                        directionText.classList.remove('up');
-                        directionText.classList.add('down');
+            const lastPriceEl = document.getElementById('last-price');
+            const entryPriceEl = document.getElementById('entry-price');
+            const multiplierEl = document.getElementById('multiplier');
+            const profitTextEl = document.getElementById('profit-text');
+            const directionTextEl = document.getElementById('direction-text');
+            const blockImage = document.querySelector('.block-image');
+
+            function parseNumber(str) {
+                if (!str) return 0;
+                return parseFloat(str.toString().replace(/\s/g, '').replace(',', '.')) || 0;
+            }
+
+            function calculateProfit() {
+                const lastPrice = parseNumber(lastPriceEl.textContent);
+                const entryPrice = parseNumber(entryPriceEl.textContent);
+                const multiplier = parseNumber(multiplierEl.textContent);
+                const isShort = directionTextEl.textContent.trim() === 'Шорт';
+
+                let rawProfit = 0;
+
+                if (entryPrice !== 0) {
+                    let priceChangePercent = ((lastPrice - entryPrice) / entryPrice) * 100;
+
+                    if (isShort) {
+                        priceChangePercent = -priceChangePercent;
                     }
-                });
-                
+
+                    rawProfit = priceChangePercent * multiplier;
+                }
+
+                let finalProfit = rawProfit.toFixed(2);
+
+                if (finalProfit > 0) {
+                    finalProfit = "+" + finalProfit;
+                }
+
+                profitTextEl.textContent = finalProfit + "%";
+
+                adjustFontSize();
+                updateProfitState(parseFloat(finalProfit));
+            }
+
+            function adjustFontSize() {
+                let length = profitTextEl.textContent.trim().length;
+                if (length > 18) {
+                    profitTextEl.style.fontSize = '20px';
+                    profitTextEl.style.lineHeight = '20px';
+                } else if (length > 14) {
+                    profitTextEl.style.fontSize = '24px';
+                    profitTextEl.style.lineHeight = '24px';
+                } else if (length > 11) {
+                    profitTextEl.style.fontSize = '28px';
+                    profitTextEl.style.lineHeight = '28px';
+                } else {
+                    profitTextEl.style.fontSize = '36px'; 
+                    profitTextEl.style.lineHeight = '36px';
+                }
+            }
+
+            function updateProfitState(number) {
+                if (isNaN(number)) return;
+                if (number < 0) {
+                    profitTextEl.style.color = '#ff006b';
+                    blockImage.style.backgroundImage = "url('img/loss_style1_V7.png')";
+                } else {
+                    profitTextEl.style.color = ''; 
+                    blockImage.style.backgroundImage = "url('img/profit_style1_V7.png')";
+                }
+            }
+
+            lastPriceEl.addEventListener('input', calculateProfit);
+            entryPriceEl.addEventListener('input', calculateProfit);
+            multiplierEl.addEventListener('input', calculateProfit);
+
+            directionTextEl.addEventListener('click', () => {
+                if (directionTextEl.textContent.trim() === 'Шорт') {
+                    directionTextEl.textContent = 'Лонг';
+                    directionTextEl.classList.remove('down');
+                    directionTextEl.classList.add('up');
+                } else {
+                    directionTextEl.textContent = 'Шорт';
+                    directionTextEl.classList.remove('up');
+                    directionTextEl.classList.add('down');
+                }
+                calculateProfit(); 
+            });
+
+
+            document.addEventListener('DOMContentLoaded', () => {
                 const statusText = document.getElementById('status-text');
                 statusText.addEventListener('click', () => {
-                    if (statusText.textContent.trim() === 'Нереализованная П/У') {
-                        statusText.textContent = 'Реализованная П/У';
-                    } else {
-                        statusText.textContent = 'Нереализованная П/У';
-                    }
+                    statusText.textContent = statusText.textContent.trim() === 'Нереализованная П/У' ? 'Реализованная П/У' : 'Нереализованная П/У';
                 });
                 
                 const TypeText = document.getElementById('type-text');
                 TypeText.addEventListener('click', () => {
-                    if (TypeText.textContent.trim() === 'Доходность') {
-                        TypeText.textContent = 'Прибыль';
-                    } else {
-                        TypeText.textContent = 'Доходность';
-                    }
+                    TypeText.textContent = TypeText.textContent.trim() === 'Доходность' ? 'Прибыль' : 'Доходность';
                 });
-            });
 
-            document.addEventListener('DOMContentLoaded', () => {
-                const profitText = document.querySelector('.profit-text');
-                const blockImage = document.querySelector('.block-image');
-                function adjustFontSize() {
-                    let length = profitText.textContent.trim().length;
-                    if (length > 18) {
-                        profitText.style.fontSize = '20px';
-                        profitText.style.lineHeight = '20px'; // Уменьшаем высоту строки, чтобы блок не съехал
-                    }
-                    else if (length > 14) {
-                        profitText.style.fontSize = '24px';
-                        profitText.style.lineHeight = '24px'; // Уменьшаем высоту строки, чтобы блок не съехал
-                    } else if (length > 11) {
-                        profitText.style.fontSize = '28px';
-                        profitText.style.lineHeight = '28px';
-                    } else {
-                        profitText.style.fontSize = '36px'; 
-                        profitText.style.lineHeight = '36px';
-                    }
-                }
-                function updateProfitState() {
-                    let text = profitText.textContent.trim();
-                    let numStr = text.replace('%', '').trim();
-                    let number = parseFloat(numStr);
-                    
-                    if (isNaN(number)) return;
-                    
-                    if (number < 0) {
-                        profitText.style.color = '#ff006b';
-                        blockImage.style.backgroundImage = "url('img/loss_style1_V7.png')";
-                    } else {
-                        profitText.style.color = ''; 
-                        blockImage.style.backgroundImage = "url('img/profit_style1_V7.png')";
-                    }
-                }
-                profitText.addEventListener('input', () => {
-                    adjustFontSize();
-                    updateProfitState();
-                });
-                adjustFontSize();
-                updateProfitState();
+                calculateProfit();
             });
 
             function showToast(message) {
@@ -26161,26 +26171,22 @@ html,.default-font-family {
                     saveBtn.disabled = false;
                 });
             });
-              const nicknameInput = document.querySelector('.nickname[contenteditable="true"]');
-  
+            const nicknameInput = document.querySelector('.nickname[contenteditable="true"]');
             if (nicknameInput) {
                 nicknameInput.addEventListener('keydown', function(event) {
-                let text = this.innerText;
-                const isControlKey = event.key.length > 1; 
-                if (text.length >= 14 && !isControlKey) {
-                    event.preventDefault(); 
-                }
+                    let text = this.innerText;
+                    const isControlKey = event.key.length > 1; 
+                    if (text.length >= 14 && !isControlKey) event.preventDefault(); 
                 });
                 nicknameInput.addEventListener('paste', function(event) {
-                event.preventDefault(); 
-                const pasteText = (event.clipboardData || window.clipboardData).getData('text');
-                const currentText = this.innerText;
-                const maxLength = 14;
-                const remainingSpace = maxLength - currentText.length;
-                
-                if (remainingSpace > 0) {
-                    document.execCommand('insertText', false, pasteText.substring(0, remainingSpace));
-                }
+                    event.preventDefault(); 
+                    const pasteText = (event.clipboardData || window.clipboardData).getData('text');
+                    const currentText = this.innerText;
+                    const maxLength = 14;
+                    const remainingSpace = maxLength - currentText.length;
+                    if (remainingSpace > 0) {
+                        document.execCommand('insertText', false, pasteText.substring(0, remainingSpace));
+                    }
                 });
             }
         </script>
