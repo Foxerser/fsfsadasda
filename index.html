@@ -26065,11 +26065,11 @@ body {
                 </div>
                 <ul class="price-info">
                     <li class="price-item">
-                        <p class="label" id="price-label">Последняя цена</p>
+                        <p class="label" style="width: 134.02px;" id="price-label">Последняя цена</p>
                         <p class="value" id="last-price" contenteditable="true">1,100.0</p>
                     </li>
                     <li class="price-item">
-                        <p class="label-two">Цена входа</p>
+                        <p class="label-two" style="width: 98.2232px;">Цена входа</p>
                         <p class="value-two" id="entry-price" contenteditable="true">1,100.0</p>
                     </li>
                 </ul>
@@ -26155,9 +26155,8 @@ body {
         const profitTextEl = document.getElementById('profit-text');
         const directionTextEl = document.getElementById('direction-text');
         const blockImage = document.querySelector('.block-image');
+        const priceLabelCss = document.querySelector('.label');
         const priceLabel = document.getElementById('price-label');
-
-        // Массивы картинок. Индексы должны совпадать!
         const greenImages = [
             'img/profit_style1_V11.png',
             'img/share_df2_up_V7.png',
@@ -26169,7 +26168,7 @@ body {
             'img/share_df5_down_V7.png'
         ];
 
-        let currentStyleIndex = 0; // Текущий выбранный дизайн (0, 1 или 2)
+        let currentStyleIndex = 0;
 
         function parseNumber(str) {
                 if (!str) return 0;
@@ -26264,9 +26263,9 @@ body {
                 TypeText.textContent = TypeText.textContent.trim() === 'Доходность' ? 'Прибыль' : 'Доходность';
             });
 
-            // Смена "Последняя цена" -> "Цена закрытия"
             priceLabel.addEventListener('click', () => {
                 priceLabel.textContent = priceLabel.textContent.trim() === 'Последняя цена' ? 'Цена закрытия' : 'Последняя цена';
+                priceLabelCss.textContent.trim() === 'Последняя цена' ? priceLabelCss.style.width = "134.02px" : priceLabelCss.style.width = "123.176px";
             });
 
             calculateProfit();
