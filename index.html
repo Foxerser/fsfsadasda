@@ -384,66 +384,165 @@ html,.default-font-family {
     src: url(https://static-app.bb-os.com/fe-common/fonts/Rubik/Rubik-Regular.ttf) format("truetype");
     unicode-range: u +20 -7e;
 }
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #191919;
+body {
+        background-color: #000;
+        color: #fff;
+        font-family: sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        box-sizing: border-box;
+        gap: 20px;
+    }
+
+    header { text-align: center; margin-bottom: 10px; }
+    h1 { margin-bottom: 20px; text-align: center; }
+
+    /* Контейнер со стрелками */
+    .editor-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        width: 100%;
+        max-width: 600px;
+    }
+
+    /* Стрелочки */
+    .nav-arrow {
+        background: #1a1a1a;
+        color: #fff;
+        border: 1px solid #333;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+        flex-shrink: 0;
+        z-index: 10;
+    }
+    .nav-arrow:hover { background: #333; }
+
+    .desktop-menu { display: none; } 
+    @media (min-width: 1024px) {
+        .desktop-menu {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
+            gap: 15px;
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #111;
             padding: 20px;
-            color: white;
+            border-radius: 12px;
+            border: 1px solid #333;
+            width: 220px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
-        h1 { margin-bottom: 20px; text-align: center; }
+        .desktop-menu h3 { margin: 0 0 10px 0; text-align: center; font-size: 16px; color: #ccc; }
+        .menu-btn {
+            background: #2a2a2a; color: #fff; border: 1px solid #444;
+            padding: 10px 15px; border-radius: 6px; cursor: pointer;
+            text-align: left; font-size: 14px; transition: all 0.2s;
+        }
+        .menu-btn:hover { background: #3a3a3a; border-color: #666; }
+    }
 
-        /* Блок для захвата */
-        #capture-block {
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            overflow: hidden;
-            position: relative;
-            height: 320px;
-            width: 320px;
-            background-color: black;
-            border: 1px solid #333; /* Рамка для видимости */
-        }
+    /* Курсор для кликабельных элементов */
+    .label, .label-two, #status-text, #type-text, #direction-text { cursor: pointer; }
 
-        /* Логотип и фон */
-        .logo-image {
-            height: 24px;
-            width: 76px;
-            background-image: url("img/logo.png");
-            background-size: contain;
-            background-repeat: no-repeat;
-            margin: 10px;
-            z-index: 2;
-            position: relative;
-        }
+    /* Кнопка скачать */
+    .save-btn {
+        background-color: #4F46E5; color: white; border: none;
+        padding: 12px 24px; border-radius: 8px; cursor: pointer;
+        margin-top: 20px; font-size: 1rem; display: flex;
+        align-items: center; gap: 8px; z-index: 10;
+    }
+
+    .spinner {
+        width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3);
+        border-radius: 50%; border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite; display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #toast {
+        display: none; position: fixed; bottom: 20px; left: 50%;
+        transform: translateX(-50%); background: #4F46E5;
+        padding: 10px 20px; border-radius: 8px; transition: opacity 0.5s;
+    }
+
+    /* === ОСНОВНОЙ БЛОК (БЕЗ ДУБЛЕЙ) === */
+    #capture-block {
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        overflow: hidden; 
+        z-index: 1;
+        height: 320px;
+        width: 320px;
+        background-color: black;
+        border: 1px solid #333;
+    }
+
         .block-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-            background-image: url(img/profit_style1_V7.png);
-            background-size: contain;
-            position: absolute;
-            background-repeat: no-repeat;
-            z-index: 0;
-        }
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover; 
+        z-index: 0;
+        display: block;
+    }
 
-        /* Стили контента */
-        .order-info {
-            z-index: 2;
-            position: relative;
-            padding: 10px;
-            font-family: "Rubik", sans-serif;
-            position: absolute;
-            top: 60px;
-        }
+    /* Логотип (Поверх фона) */
+    .logo-image {
+        height: 24px;
+        width: 76px;
+        background-image: url("img/logo.png");
+        background-size: contain;
+        background-repeat: no-repeat;
+        margin: 10px;
+        z-index: 2;
+        position: relative;
+    }
+
+    /* Информация о сделке (Поверх фона) */
+    .order-info {
+        z-index: 2;
+        padding: 10px;
+        font-family: "Rubik", sans-serif;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
+
+    /* === ИСПРАВЛЕНИЕ QR-КОДА === */
+    .invite-qr-code-wrapper-small {
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .img_ref {
+        width: 100%;
+        height: 100%;
+        object-fit: contain; 
+    }
         .base-up {     --toast-icon-margin-start: -3px;
     --toast-icon-margin-end: 4px;
     --toast-svg-margin-start: -1px;
@@ -4819,7 +4918,7 @@ html,.default-font-family {
     font-weight: 500;
     line-height: 14px;
     white-space: nowrap;
-    color: #ff006b!important; }
+    color: #ff006b!important }
 
         .order-profit-desc {     --toast-icon-margin-start: -3px;
     --toast-icon-margin-end: 4px;
@@ -25880,19 +25979,19 @@ html,.default-font-family {
     padding: 0;
     width: 100%;
     }
-        .save-btn {
-            background-color: #4F46E5;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 20px;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+    .save-btn {
+        background-color: #4F46E5;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 20px;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
         .save-btn:hover { background-color: #4338ca; }
         .save-btn:active { transform: scale(0.98); }
         .save-btn:disabled { opacity: 0.6; cursor: not-allowed; }
@@ -25908,65 +26007,73 @@ html,.default-font-family {
         }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        #toast {
-            visibility: hidden;
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            border-radius: 8px;
-            padding: 16px;
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity 0.3s, bottom 0.3s;
-        }
         #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
         .base-item.down {
-            color: #ff4d4d !important; 
+            color: #ff006b!important;
         }
         .base-item.up {
             color: #00ff9d !important;
         }
+    .profit-text.down {
+        color: #ff006b !important;
+    }
+    .profit-text.up {
+        color: #00ff9d !important;
+    }
     </style>
 </head>
 <body>
     <header>
         <h1>Генерация шаблона</h1>
     </header>
-    <main id="capture-block">
-        <div class="logo-image"></div>
-        <div class="block-image"></div>
-        <div class="order-info with-user-info">
-            <span class="base-up" id="status-text">Нереализованная П/У</span>
-            <div class="base-info">
-                <span class="base-item" contenteditable="true">BTCUSDT</span>
-                <span class="divider"></span>
-                <span class="base-item down" id="direction-text">Шорт</span>
-                <span class="divider"></span>
-                <span class="base-item" id="multiplier" contenteditable="true">20X</span>
-            </div>
-            <span class="order-profit-desc" id="type-text">Доходность</span>
-            <div class="order-profit-proc">
-                <span class="profit-text" id="profit-text" contenteditable="true">0.00%</span>
-            </div>
-            <ul class="price-info">
-                <li class="price-item">
-                    <p class="label">Последняя цена</p>
-                    <p class="value" id="last-price" contenteditable="true">1,100.0</p>
-                </li>
-                <li class="price-item">
-                    <p class="label-two">Цена входа</p>
-                    <p class="value-two" id="entry-price" contenteditable="true">1,100.0</p>
-                </li>
-            </ul>
-            <div data-v-2299138f="" class="user-invite-info">
-                <div data-v-2299138f="" class="user-wrapper">
-                    <div data-v-0a364712="" data-v-2299138f="" class="user-info-wrapper" align="right">
-                        <div data-v-0a364712="" class="avatar clickable-image" data-target="avatar" title="Нажмите, чтобы сменить аватар">
-                            <div data-v-df87146e="" data-v-0a364712="" class="avatar-outline-img-wrap" style="width: 39px; height: 39px;">
-                                <img data-v-df87146e="" src="https://static-app.bb-os.com/avatar/20230901/avatar_1.png?x-oss-process=image%2Fresize%2Ch_90%2Cm_lfit" class="avatar-outline-img" id="avatar-img"><!----></div>
+
+    <aside class="desktop-menu">
+        <h3>Управление</h3>
+        <button class="menu-btn" data-action="toggle-status">Сменить статус П/У</button>
+        <button class="menu-btn" data-action="toggle-direction">Сменить Лонг/Шорт</button>
+        <button class="menu-btn" data-action="toggle-type">Сменить "Доходность"</button>
+        <button class="menu-btn" data-action="toggle-price-label">Сменить "Последняя цена"</button>
+        <button class="menu-btn" data-action="toggle-profit-color">Сменить цвет доходности</button>
+        <button class="menu-btn" data-action="prev-image">Предыдущий фон</button>
+        <button class="menu-btn" data-action="next-image">Следующий фон</button>
+    </aside>
+
+    <div class="editor-container">
+        <button class="nav-arrow left-arrow" id="prev-img-btn">‹</button>
+
+        <main id="capture-block">
+            <div class="logo-image"></div>
+            <img src="img/profit_style1_V11.png" class="block-image" alt="Background">
+            <div class="order-info with-user-info">
+                <span class="base-up" id="status-text">Нереализованная П/У</span>
+                <div class="base-info">
+                    <span class="base-item" contenteditable="true">BTCUSDT</span>
+                    <span class="divider"></span>
+                    <span class="base-item down" id="direction-text">Шорт</span>
+                    <span class="divider"></span>
+                    <span class="base-item" id="multiplier" contenteditable="true">20X</span>
+                </div>
+                <span class="order-profit-desc" id="type-text">Доходность</span>
+                <div class="order-profit-proc">
+                    <span class="profit-text" id="profit-text" contenteditable="true">0.00%</span>
+                </div>
+                <ul class="price-info">
+                    <li class="price-item">
+                        <p class="label" id="price-label">Последняя цена</p>
+                        <p class="value" id="last-price" contenteditable="true">1,100.0</p>
+                    </li>
+                    <li class="price-item">
+                        <p class="label-two">Цена входа</p>
+                        <p class="value-two" id="entry-price" contenteditable="true">1,100.0</p>
+                    </li>
+                </ul>
+                <div data-v-2299138f="" class="user-invite-info">
+                    <div data-v-2299138f="" class="user-wrapper">
+                        <div data-v-0a364712="" data-v-2299138f="" class="user-info-wrapper" align="right">
+                            <div data-v-0a364712="" class="avatar clickable-image" data-target="avatar" title="Нажмите, чтобы сменить аватар">
+                                <div data-v-df87146e="" data-v-0a364712="" class="avatar-outline-img-wrap" style="width: 39px; height: 39px;">
+                                    <img data-v-df87146e="" src="https://static-app.bb-os.com/avatar/20230901/avatar_1.png?x-oss-process=image%2Fresize%2Ch_90%2Cm_lfit" class="avatar-outline-img" id="avatar-img">
+                                </div>
                             </div>
                             <div data-v-0a364712="" class="user-info">
                                 <p data-v-0a364712="" class="nickname" contenteditable="true">mi***6@gmail.com</p>
@@ -25986,61 +26093,79 @@ html,.default-font-family {
                 </div>  
             </div>
         </main>
-        <input type="file" id="file-input-avatar" accept="image/*" style="display: none;">
-        <input type="file" id="file-input-qr" accept="image/*" style="display: none;">
 
-        <button id="save-btn" class="save-btn">
-            <div class="spinner" id="spinner"></div>
-            <span id="btn-text">Скачать изображение</span>
-        </button>
-        <div id="toast">Фото успешно сохранено!</div>
-        
-        <script>
-            const fileInputAvatar = document.getElementById('file-input-avatar');
-            const fileInputQr = document.getElementById('file-input-qr');
-            const avatarImg = document.getElementById('avatar-img');
-            const qrImg = document.getElementById('qr-img');
-            let currentTarget = null;
+        <button class="nav-arrow right-arrow" id="next-img-btn">›</button>
+    </div>
 
-            document.querySelectorAll('.clickable-image').forEach(block => {
-                block.addEventListener('click', (e) => {
-                    if (e.target.getAttribute('contenteditable') === 'true') return;
-                    currentTarget = block.getAttribute('data-target');
-                    if (currentTarget === 'avatar') fileInputAvatar.click();
-                    else if (currentTarget === 'qr') fileInputQr.click();
-                });
-                block.style.cursor = 'pointer';
+    <input type="file" id="file-input-avatar" accept="image/*" style="display: none;">
+    <input type="file" id="file-input-qr" accept="image/*" style="display: none;">
+
+    <button id="save-btn" class="save-btn">
+        <div class="spinner" id="spinner"></div>
+        <span id="btn-text">Скачать изображение</span>
+    </button>
+    <div id="toast">Фото успешно сохранено!</div>
+    
+    <script>
+        const fileInputAvatar = document.getElementById('file-input-avatar');
+        const fileInputQr = document.getElementById('file-input-qr');
+        const avatarImg = document.getElementById('avatar-img');
+        const qrImg = document.getElementById('qr-img');
+        let currentTarget = null;
+
+        document.querySelectorAll('.clickable-image').forEach(block => {
+            block.addEventListener('click', (e) => {
+                if (e.target.getAttribute('contenteditable') === 'true') return;
+                currentTarget = block.getAttribute('data-target');
+                if (currentTarget === 'avatar') fileInputAvatar.click();
+                else if (currentTarget === 'qr') fileInputQr.click();
             });
+            block.style.cursor = 'pointer';
+        });
 
-            function handleImageUpload(input, imgElement) {
-                input.addEventListener('change', function(e) {
-                    const file = e.target.files[0];
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = function(ev) { imgElement.src = ev.target.result; };
-                        reader.readAsDataURL(file);
-                    }
-                    this.value = '';
-                });
-            }
-            handleImageUpload(fileInputAvatar, avatarImg);
-            handleImageUpload(fileInputQr, qrImg);
+        function handleImageUpload(input, imgElement) {
+            input.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(ev) { imgElement.src = ev.target.result; };
+                    reader.readAsDataURL(file);
+                }
+                this.value = '';
+            });
+        }
+        handleImageUpload(fileInputAvatar, avatarImg);
+        handleImageUpload(fileInputQr, qrImg);
 
+        const blockToCapture = document.getElementById('capture-block');
+        const saveBtn = document.getElementById('save-btn');
+        const btnText = document.getElementById('btn-text');
+        const spinner = document.getElementById('spinner');
+        const toast = document.getElementById('toast');
 
-            const blockToCapture = document.getElementById('capture-block');
-            const saveBtn = document.getElementById('save-btn');
-            const btnText = document.getElementById('btn-text');
-            const spinner = document.getElementById('spinner');
-            const toast = document.getElementById('toast');
+        const lastPriceEl = document.getElementById('last-price');
+        const entryPriceEl = document.getElementById('entry-price');
+        const multiplierEl = document.getElementById('multiplier');
+        const profitTextEl = document.getElementById('profit-text');
+        const directionTextEl = document.getElementById('direction-text');
+        const blockImage = document.querySelector('.block-image');
+        const priceLabel = document.getElementById('price-label');
 
-            const lastPriceEl = document.getElementById('last-price');
-            const entryPriceEl = document.getElementById('entry-price');
-            const multiplierEl = document.getElementById('multiplier');
-            const profitTextEl = document.getElementById('profit-text');
-            const directionTextEl = document.getElementById('direction-text');
-            const blockImage = document.querySelector('.block-image');
+        // Массивы картинок. Индексы должны совпадать!
+        const greenImages = [
+            'img/profit_style1_V11.png',
+            'img/share_df2_up_V7.png',
+            'img/share_df5_up_V7.png'
+        ];
+        const redImages = [
+            'img/loss_style1_V11.png',
+            'img/share_df2_down_V7.png',
+            'img/share_df5_down_V7.png'
+        ];
 
-            function parseNumber(str) {
+        let currentStyleIndex = 0; // Текущий выбранный дизайн (0, 1 или 2)
+
+        function parseNumber(str) {
                 if (!str) return 0;
                 return parseFloat(str.toString().replace(/\s/g, '').replace(',', '.')) || 0;
             }
@@ -26075,120 +26200,179 @@ html,.default-font-family {
                 updateProfitState(parseFloat(finalProfit));
             }
 
-            function adjustFontSize() {
-                let length = profitTextEl.textContent.trim().length;
-                if (length > 18) {
-                    profitTextEl.style.fontSize = '20px';
-                    profitTextEl.style.lineHeight = '20px';
-                } else if (length > 14) {
-                    profitTextEl.style.fontSize = '24px';
-                    profitTextEl.style.lineHeight = '24px';
-                } else if (length > 11) {
-                    profitTextEl.style.fontSize = '28px';
-                    profitTextEl.style.lineHeight = '28px';
-                } else {
-                    profitTextEl.style.fontSize = '36px'; 
-                    profitTextEl.style.lineHeight = '36px';
-                }
+        function adjustFontSize() {
+            let length = profitTextEl.textContent.trim().length;
+            if (length > 18) {
+                profitTextEl.style.fontSize = '20px';
+                profitTextEl.style.lineHeight = '20px';
+            } else if (length > 14) {
+                profitTextEl.style.fontSize = '24px';
+                profitTextEl.style.lineHeight = '24px';
+            } else if (length > 11) {
+                profitTextEl.style.fontSize = '28px';
+                profitTextEl.style.lineHeight = '28px';
+            } else {
+                profitTextEl.style.fontSize = '36px'; 
+                profitTextEl.style.lineHeight = '36px';
             }
+        }
 
-            function updateProfitState(number) {
-                if (isNaN(number)) return;
-                if (number < 0) {
-                    profitTextEl.style.color = '#ff006b';
-                    blockImage.style.backgroundImage = "url('img/loss_style1_V7.png')";
-                } else {
-                    profitTextEl.style.color = ''; 
-                    blockImage.style.backgroundImage = "url('img/profit_style1_V7.png')";
-                }
+       function updateProfitState(number) {
+            if (isNaN(number)) return;
+            profitTextEl.classList.remove('down', 'up');
+            
+            if (number < 0) {
+                profitTextEl.classList.add('down');
+                blockImage.src = redImages[currentStyleIndex];
+            } else {
+                profitTextEl.classList.add('up');  
+                blockImage.src = greenImages[currentStyleIndex];
             }
+        }
 
-            lastPriceEl.addEventListener('input', calculateProfit);
-            entryPriceEl.addEventListener('input', calculateProfit);
-            multiplierEl.addEventListener('input', calculateProfit);
+        lastPriceEl.addEventListener('input', calculateProfit);
+        entryPriceEl.addEventListener('input', calculateProfit);
+        multiplierEl.addEventListener('input', calculateProfit);
 
-            directionTextEl.addEventListener('click', () => {
-                if (directionTextEl.textContent.trim() === 'Шорт') {
-                    directionTextEl.textContent = 'Лонг';
-                    directionTextEl.classList.remove('down');
-                    directionTextEl.classList.add('up');
-                } else {
-                    directionTextEl.textContent = 'Шорт';
-                    directionTextEl.classList.remove('up');
-                    directionTextEl.classList.add('down');
-                }
-                calculateProfit(); 
+        directionTextEl.addEventListener('click', () => {
+            if (directionTextEl.textContent.trim() === 'Шорт') {
+                directionTextEl.textContent = 'Лонг';
+                directionTextEl.classList.remove('down');
+                directionTextEl.classList.add('up');
+            } else {
+                directionTextEl.textContent = 'Шорт';
+                directionTextEl.classList.remove('up');
+                directionTextEl.classList.add('down');
+            }
+            calculateProfit(); 
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const statusText = document.getElementById('status-text');
+            statusText.addEventListener('click', () => {
+                statusText.textContent = statusText.textContent.trim() === 'Нереализованная П/У' ? 'Реализованная П/У' : 'Нереализованная П/У';
+            });
+            
+            const TypeText = document.getElementById('type-text');
+            TypeText.addEventListener('click', () => {
+                TypeText.textContent = TypeText.textContent.trim() === 'Доходность' ? 'Прибыль' : 'Доходность';
             });
 
-
-            document.addEventListener('DOMContentLoaded', () => {
-                const statusText = document.getElementById('status-text');
-                statusText.addEventListener('click', () => {
-                    statusText.textContent = statusText.textContent.trim() === 'Нереализованная П/У' ? 'Реализованная П/У' : 'Нереализованная П/У';
-                });
-                
-                const TypeText = document.getElementById('type-text');
-                TypeText.addEventListener('click', () => {
-                    TypeText.textContent = TypeText.textContent.trim() === 'Доходность' ? 'Прибыль' : 'Доходность';
-                });
-
-                calculateProfit();
+            // Смена "Последняя цена" -> "Цена закрытия"
+            priceLabel.addEventListener('click', () => {
+                priceLabel.textContent = priceLabel.textContent.trim() === 'Последняя цена' ? 'Цена закрытия' : 'Последняя цена';
             });
 
-            function showToast(message) {
-                toast.textContent = message;
-                toast.style.display = "block";
-                toast.style.opacity = 1;
-                setTimeout(() => {
-                    toast.style.opacity = 0;
-                    setTimeout(() => toast.style.display = "none", 500);
-                }, 3000);
-            }
+            calculateProfit();
+        });
 
-            saveBtn.addEventListener('click', () => {
-                btnText.textContent = "Генерация...";
-                spinner.style.display = "block";
-                saveBtn.disabled = true;
-                
-                modernScreenshot.domToPng(blockToCapture, {
-                    scale: 3,
-                    backgroundColor: "#000000",
-                    quality: 1,
-                }).then(dataUrl => {
-                    const link = document.createElement('a');
-                    link.download = `template-${new Date().getTime()}.png`;
-                    link.href = dataUrl;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    showToast("Блок успешно сохранен в фото!");
-                }).catch(err => {
-                    console.error("Ошибка:", err);
-                    showToast("Ошибка при сохранении.");
-                }).finally(() => {
-                    btnText.textContent = "Скачать изображение";
-                    spinner.style.display = "none";
-                    saveBtn.disabled = false;
-                });
+        function showToast(message) {
+            toast.textContent = message;
+            toast.style.display = "block";
+            toast.style.opacity = 1;
+            setTimeout(() => {
+                toast.style.opacity = 0;
+                setTimeout(() => toast.style.display = "none", 500);
+            }, 3000);
+        }
+
+        saveBtn.addEventListener('click', () => {
+            btnText.textContent = "Генерация...";
+            spinner.style.display = "block";
+            saveBtn.disabled = true;
+            
+            modernScreenshot.domToPng(blockToCapture, {
+                scale: 3,
+                backgroundColor: "#000000",
+                quality: 1,
+            }).then(dataUrl => {
+                const link = document.createElement('a');
+                link.download = `template-${new Date().getTime()}.png`;
+                link.href = dataUrl;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showToast("Блок успешно сохранен в фото!");
+            }).catch(err => {
+                console.error("Ошибка:", err);
+                showToast("Ошибка при сохранении.");
+            }).finally(() => {
+                btnText.textContent = "Скачать изображение";
+                spinner.style.display = "none";
+                saveBtn.disabled = false;
             });
-            const nicknameInput = document.querySelector('.nickname[contenteditable="true"]');
-            if (nicknameInput) {
-                nicknameInput.addEventListener('keydown', function(event) {
-                    let text = this.innerText;
-                    const isControlKey = event.key.length > 1; 
-                    if (text.length >= 14 && !isControlKey) event.preventDefault(); 
-                });
-                nicknameInput.addEventListener('paste', function(event) {
-                    event.preventDefault(); 
-                    const pasteText = (event.clipboardData || window.clipboardData).getData('text');
-                    const currentText = this.innerText;
-                    const maxLength = 14;
-                    const remainingSpace = maxLength - currentText.length;
-                    if (remainingSpace > 0) {
-                        document.execCommand('insertText', false, pasteText.substring(0, remainingSpace));
-                    }
-                });
-            }
-        </script>
-    </body>
+        });
+
+        const nicknameInput = document.querySelector('.nickname[contenteditable="true"]');
+        if (nicknameInput) {
+            nicknameInput.addEventListener('keydown', function(event) {
+                let text = this.innerText;
+                const isControlKey = event.key.length > 1; 
+                if (text.length >= 14 && !isControlKey) event.preventDefault(); 
+            });
+            nicknameInput.addEventListener('paste', function(event) {
+                event.preventDefault(); 
+                const pasteText = (event.clipboardData || window.clipboardData).getData('text');
+                const currentText = this.innerText;
+                const maxLength = 14;
+                const remainingSpace = maxLength - currentText.length;
+                if (remainingSpace > 0) {
+                    document.execCommand('insertText', false, pasteText.substring(0, remainingSpace));
+                }
+            });
+        }
+
+        // === ЛОГИКА СТРЕЛОК И БОКОВОГО МЕНЮ ===
+
+        // Функция для стрелок (меняет индекс дизайна и сразу обновляет фон)
+        function changeBlockImage(direction) {
+            currentStyleIndex = (currentStyleIndex + direction + greenImages.length) % greenImages.length;
+            
+            // Чтобы цвет оставался корректным при смене дизайна, вызываем расчет прибыли
+            // Она сама перекрасит фон в нужный цвет с новым индексом
+            calculateProfit(); 
+        }
+
+        document.getElementById('prev-img-btn').addEventListener('click', () => changeBlockImage(-1));
+        document.getElementById('next-img-btn').addEventListener('click', () => changeBlockImage(1));
+
+        document.querySelectorAll('.menu-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const action = btn.getAttribute('data-action');
+                switch(action) {
+                    case 'toggle-status':
+                        document.getElementById('status-text').click();
+                        break;
+                    case 'toggle-direction':
+                        directionTextEl.click();
+                        break;
+                    case 'toggle-type':
+                        document.getElementById('type-text').click();
+                        break;
+                    case 'toggle-price-label':
+                        priceLabel.click();
+                        break;
+                    case 'toggle-profit-color':
+                        if (profitTextEl.classList.contains('down')) {
+                            profitTextEl.classList.remove('down');
+                            profitTextEl.classList.add('up');
+                            blockImage.src = greenImages[currentStyleIndex]; 
+                        } else {
+                            profitTextEl.classList.remove('up');
+                            profitTextEl.classList.add('down');
+                            blockImage.src = redImages[currentStyleIndex];
+                        }
+                        break;
+                        
+                    case 'prev-image':
+                        changeBlockImage(-1);
+                        break;
+                    case 'next-image':
+                        changeBlockImage(1);
+                        break;
+                }
+            });
+        });
+    </script>
+</body>
 </html>
