@@ -26207,21 +26207,24 @@ body {
 
         function adjustFontSize() {
             let length = profitTextEl.textContent.trim().length;
-            if (length > 18) {
-                profitTextEl.style.fontSize = '20px';
-                profitTextEl.style.lineHeight = '20px';
+            let fontSize = 36; // Базовый размер
+            
+            if (length > 35) {
+                fontSize = 14;
+            } else if (length > 25) {
+                fontSize = 16;
+            } else if (length > 18) {
+                fontSize = 20;
             } else if (length > 14) {
-                profitTextEl.style.fontSize = '24px';
-                profitTextEl.style.lineHeight = '24px';
+                fontSize = 24;
             } else if (length > 11) {
-                profitTextEl.style.fontSize = '28px';
-                profitTextEl.style.lineHeight = '28px';
-            } else {
-                profitTextEl.style.fontSize = '36px'; 
-                profitTextEl.style.lineHeight = '36px';
+                fontSize = 28;
             }
+        
+            profitTextEl.style.fontSize = fontSize + 'px';
+            profitTextEl.style.lineHeight = fontSize + 'px';
         }
-
+        profitTextEl.addEventListener('input', adjustFontSize);
        function updateProfitState(number) {
             if (isNaN(number)) return;
             profitTextEl.classList.remove('down', 'up');
